@@ -2,7 +2,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Copyright from '@mui/icons-material/Copyright';
 import FormatListNumbered from '@mui/icons-material/FormatListNumbered';
@@ -19,6 +18,12 @@ const steps = ["Registering voters",
   "Voting session started",
   "Voting session ended",
   "Votes tallied"];
+
+const defaultVoter = {
+  isRegistered: false,
+  hasVoted: false,
+  votedProposalId: 0
+}
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -53,22 +58,34 @@ function a11yProps(index) {
   };
 }
 
-export default function BasicTabs() {
+function BasicTabs() {
   const [value, setValue] = React.useState(0);
-  const { state: { isOwner, contract, currentAccount } } = useEth();
+  const { state: { isOwner, contract, currentAccount, accounts } } = useEth();
   const [activeStep, setActiveStep] = React.useState(0);
+  const [proposalsId, setProposalsId] = React.useState([]);
+  const [voter, setVoter] = React.useState(defaultVoter);
+
+  const initStep = async () => {
+    console.log("Init step");
+    let step = await contract.methods.workflowStatus().call({ from: currentAccount });
+    console.log(step);
+    setActiveStep(parseInt(step));
+  }
+
+  const initVoter = async () => {
+    console.log("Init voter");
+    setVoter(defaultVoter);
+    setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
+  }
 
   React.useEffect(() => {
-    async function initStep() {
-      console.log("Init step");
-      let step = await contract.methods.workflowStatus().call({ from: currentAccount });
-      console.log(step);
-      setActiveStep(parseInt(step));
-    }
-    if(contract) {
+    console.log("Main tabs");
+    if (contract) {
       initStep().catch(console.log);
+      setVoter(defaultVoter);
+      initVoter().catch(console.log);
     };
-  }, [contract]) // empty array means nothing to watch, so run once and no more
+  }, [contract, currentAccount])
 
   // const [inputAddress, setInputAddress] = useState("");
 
@@ -78,8 +95,10 @@ export default function BasicTabs() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', display:'flex', alignItems: 'center',
-    justifyContent: 'center' }}>
+      <Box sx={{
+        borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center',
+        justifyContent: 'center'
+      }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           <Tab icon={<FormatListNumbered />} label="PROPOSALS" {...a11yProps(0)} />
           <Tab icon={<Person />} label="VOTER" {...a11yProps(1)} />
@@ -89,22 +108,30 @@ export default function BasicTabs() {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <TabProposals />
+        <TabProposals
+          activeStep={activeStep}
+          steps={steps}
+          voter={voter}
+           />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <TabVoter 
-        steps={steps}
-        activeStep={activeStep} 
-        />
+        <TabVoter
+          steps={steps}
+          activeStep={activeStep}
+          voter={voter}
+          setVoter={setVoter}
+          defaultVoter={defaultVoter} />
       </TabPanel>
       {isOwner &&
         <TabPanel value={value} index={2}>
-          <TabOwner 
-          steps={steps}
-          activeStep={activeStep} 
-          setActiveStep={setActiveStep}  />
+          <TabOwner
+            steps={steps}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep} />
         </TabPanel>
       }
     </Box>
   );
 }
+
+export default BasicTabs;

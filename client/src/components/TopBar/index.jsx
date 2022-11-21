@@ -7,8 +7,53 @@ import Typography from '@mui/material/Typography';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Address from "./Address";
+import useEth from "../../contexts/EthContext/useEth";
+import { useSnackbar } from 'notistack';
 
 function TopBar() {
+
+  const { state: { contract } } = useEth();
+  const [notification, setNotifications] = React.useState(0);
+  let notifCount = 0 // Lack of react knowledge
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const addNotif = () => {
+    console.log("Set notif from "+notification);
+    console.log("From "+notifCount);
+    setNotifications(++notifCount);
+  }
+
+  const subscribeEvent = () => {
+    contract.events.ProposalRegistered(() => {
+    }).on("connected", function (subscriptionId) {
+      console.log('SubID: ', subscriptionId);
+    })
+      .on('data', function (event) {
+        console.log('Event: ' + event);
+        console.log('Proposal ID: ' + event.returnValues.proposalId);
+        // addProposalId(event.returnValues.proposalId);
+        addNotif();
+        enqueueSnackbar('New proposal added, ID: ' + event.returnValues.proposalId
+          , { variant: 'info'});
+      })
+      .on('changed', function (event) {
+        //Do something when it is removed from the database.
+      })
+      .on('error', function (error, receipt) {
+        console.log('Error:', error, receipt);
+      });
+  }
+
+  /* const addProposalId = (proposalId) => {
+    setProposalsId(current => [...current, proposalId]);
+  } */
+
+  React.useEffect(() => {
+    if (contract) {
+      subscribeEvent();
+    };
+  }, [contract]) // empty array means nothing to watch, so run once and no more
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -29,11 +74,11 @@ function TopBar() {
               aria-label="show 17 new notifications"
               color="inherit"
             >
-              <Badge badgeContent={0} color="error">
+              <Badge badgeContent={notification} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <Address/>
+            <Address />
           </Box>
         </Toolbar>
       </AppBar>

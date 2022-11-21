@@ -19,7 +19,7 @@ const contractNextStep = [
 ]
 
 function TabOwner({ activeStep, setActiveStep, steps }) {
-  const { state: { isOwner, contract, currentAccount } } = useEth();
+  const { state: { contract, currentAccount, web3 } } = useEth();
 
   const [inputAddress, setInputAddress] = React.useState("");
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -36,7 +36,7 @@ function TabOwner({ activeStep, setActiveStep, steps }) {
   };
 
   const handleAddressChange = e => {
-    if(/^0x[a-fA-F0-9]{40}/.test(e.target.value)) {
+    if(web3.utils.isAddress(e.target.value)) {
       setInputAddress(e.target.value);
       setErrorMessage("");
     } else {
@@ -101,7 +101,7 @@ function TabOwner({ activeStep, setActiveStep, steps }) {
               onChange={handleAddressChange}
             />
             <Button 
-              disabled={errorMessage !== "" || inputAddress.length == 0}
+              disabled={errorMessage !== "" || inputAddress.length === 0}
               variant="contained" 
               color="secondary" 
               onClick={addVoter}>

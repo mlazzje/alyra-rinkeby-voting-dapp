@@ -1,26 +1,18 @@
 import * as React from 'react';
 import useEth from "../../contexts/EthContext/useEth";
-import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
-function TabVoter({ steps, activeStep }) {
-  const defaultVoter = {
-    isRegistered: false,
-    hasVoted: false,
-    votedProposalId: 0
-  }
-  const { state: { contract, currentAccount, accounts } } = useEth();
-  const [voter, setVoter] = React.useState(defaultVoter);
+function TabVoter({ steps, activeStep, voter, setVoter, defaultVoter }) {
+  const { state: { contract, currentAccount } } = useEth();
 
   const [errorMessage, setErrorMessage] = React.useState("");
 
   const inputProposal = React.useRef(null);
+  const inputVote = React.useRef(null);
 
   function BadWorkFlow() {
     return <Typography>
@@ -39,16 +31,13 @@ function TabVoter({ steps, activeStep }) {
     const addProposal = async () => {
       const input = inputProposal.current.value || "";
       console.log("Add Proposal: " + input);
-      if (input.length == 0) {
+      if (input.length === 0) {
         setErrorMessage("You can't propose nothing");
       } else {
         setErrorMessage("");
         await contract.methods.addProposal(input).send({ from: currentAccount });
         inputProposal.current.value = "";
       }
-      /* await contract.methods.addVoter(inputAddress).send({ from: currentAccount });
-      setInputAddress("");
-      setErrorMessage(""); */
     }
 
     return (
@@ -67,26 +56,88 @@ function TabVoter({ steps, activeStep }) {
   }
 
   function VotingVote() {
-    return <Button variant="contained" color="primary">Vote</Button>;
+    const addVote = async () => {
+      const input = inputVote.current.value || "";
+      console.log("Vote: " + input);
+      if (input.length === 0 && input === 0) {
+        setErrorMessage("You can't vote nothing");
+        inputVote.current.value = "";
+      } else if (!/^\d+$/.test(input)) {
+        setErrorMessage("Should be a proposal ID (number)");
+        inputVote.current.value = "";
+      }
+      else {
+        setErrorMessage("");
+        try {
+          await contract.methods.setVote(input).send({ from: currentAccount });
+        } catch (e) {
+          console.error(e);
+          setErrorMessage("ProposalID ["+input+"] doesn't exist");
+          return;
+        }
+        console.log("hide voting");
+        setVoter({
+          isRegistered: true,
+          hasVoted: true,
+          votedProposalId: input
+        });
+      }
+    }
+
+    return (
+      <Stack spacing={2}>
+        <TextField
+          variant="outlined"
+          inputRef={inputVote}
+          error={errorMessage !== ""}
+          id="input-vote"
+          placeholder="proposal ID"
+          label="Vote for proposal"
+          helperText={errorMessage}
+          inputProps={{ type: 'number' }} />
+        <Button onClick={addVote} variant="contained" color="primary">Vote</Button>
+      </Stack>
+    )
+  }
+
+  function AlreadyVoted() {
+    return <Typography>
+      You already voted for proposal ID [{voter.votedProposalId}]!
+    </Typography>;
+  }
+
+  function VotesTallied() {
+    return <Typography>
+      Watch results in proposals tab!
+    </Typography>;
   }
 
   function VotingContent() {
     let content;
     switch (steps[activeStep]) {
       case "Proposals registration started":
-        content = <VotingProposal />;
+        if (voter.isRegistered) {
+          content = <VotingProposal />;
+        } else {
+          content = <NotRegistered />;
+        }
         break;
       case "Voting session started":
-        content = <VotingVote />;
+        if (voter.isRegistered && !voter.hasVoted) {
+          content = <VotingVote />;
+        } else if(voter.hasVoted) {
+          content = <AlreadyVoted />;
+        } else {
+          content = <NotRegistered />;
+        }
+        break;
+      case "Votes tallied":
+        content = <VotesTallied />;
         break;
       default:
         content = <BadWorkFlow />;
     }
-    if (voter.isRegistered) {
-      return content
-    } else {
-      return <NotRegistered />;
-    }
+    return content;
   }
 
   React.useEffect(() => {
@@ -96,7 +147,7 @@ function TabVoter({ steps, activeStep }) {
       setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
     }
     initVoter().catch(console.log);
-  }, [activeStep, accounts]) // empty array means nothing to watch, so run once and no more
+  }, [activeStep, currentAccount]) // empty array means nothing to watch, so run once and no more
 
   return (
     <Box sx={{

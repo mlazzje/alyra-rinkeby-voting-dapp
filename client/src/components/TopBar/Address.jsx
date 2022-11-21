@@ -1,7 +1,6 @@
 import useEth from "../../contexts/EthContext/useEth";
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 
 function Address() {

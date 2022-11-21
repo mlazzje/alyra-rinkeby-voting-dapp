@@ -14,28 +14,28 @@ Web3.js v1.7.4
 ## Init
 
 Install node modules required by backend and frontend
-```
+```sh
 npm --prefix client install client
 npm --prefix truffle install truffle
 ```
 
 ### Truffle
 Create .env file based on truffle/.env.example file
-```
+```sh
 touch truffle/.env
 ```
 
 To run tests, run ganache and run this command
-```
+```sh
 truffle test test/voting.test.js --network development
 ```
 
 To deploy Voting contract locally
-```
+```sh
 truffle deploy Voting.sol --network development
 ```
 To deploy Voting contract on Goerli
-```
+```sh
 truffle deploy Voting.sol --network goerli
 ```
 

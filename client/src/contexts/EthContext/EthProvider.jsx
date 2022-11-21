@@ -14,13 +14,13 @@ function EthProvider({ children }) {
         const currentAccount = accounts[0];
         const networkID = await web3.eth.net.getId();
         const { abi } = artifact;
-        let address, contract, owner, voter, isOwner;
+        let address, contract, owner, isOwner;
         console.log("init");
         try {
           address = artifact.networks[networkID].address;
           contract = new web3.eth.Contract(abi, address);
           owner = await contract.methods.owner().call({ from: currentAccount });
-          isOwner = (owner==currentAccount);
+          isOwner = (owner===currentAccount);
         } catch (err) {
           console.error(err);
         }
