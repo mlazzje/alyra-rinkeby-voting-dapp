@@ -147,7 +147,7 @@ function TabVoter({ steps, activeStep, voter, setVoter, defaultVoter }) {
       setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
     }
     initVoter().catch(console.log);
-  }, [activeStep, currentAccount]) // empty array means nothing to watch, so run once and no more
+  }, [contract, activeStep, currentAccount, defaultVoter, setVoter]) // empty array means nothing to watch, so run once and no more
 
   return (
     <Box sx={{

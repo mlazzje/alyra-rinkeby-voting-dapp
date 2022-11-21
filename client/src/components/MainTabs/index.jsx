@@ -60,25 +60,24 @@ function a11yProps(index) {
 
 function BasicTabs() {
   const [value, setValue] = React.useState(0);
-  const { state: { isOwner, contract, currentAccount, accounts } } = useEth();
+  const { state: { isOwner, contract, currentAccount } } = useEth();
   const [activeStep, setActiveStep] = React.useState(0);
-  const [proposalsId, setProposalsId] = React.useState([]);
   const [voter, setVoter] = React.useState(defaultVoter);
 
-  const initStep = async () => {
-    console.log("Init step");
-    let step = await contract.methods.workflowStatus().call({ from: currentAccount });
-    console.log(step);
-    setActiveStep(parseInt(step));
-  }
-
-  const initVoter = async () => {
-    console.log("Init voter");
-    setVoter(defaultVoter);
-    setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
-  }
-
   React.useEffect(() => {
+    const initVoter = async () => {
+      console.log("Init voter");
+      setVoter(defaultVoter);
+      setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
+    }
+
+    const initStep = async () => {
+      console.log("Init step");
+      let step = await contract.methods.workflowStatus().call({ from: currentAccount });
+      console.log(step);
+      setActiveStep(parseInt(step));
+    }
+
     console.log("Main tabs");
     if (contract) {
       initStep().catch(console.log);

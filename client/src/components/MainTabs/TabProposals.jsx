@@ -15,6 +15,7 @@ import CardContent from '@mui/material/CardContent';
 function TabProposals({ voter, steps, activeStep }) {
   const { state: { currentAccount, contract } } = useEth();
   const [proposals, setProposals] = React.useState([]);
+  const [winningProposalId, setWinningProposalId] =  React.useState(0);
   const [winningProposal, setWinningProposal] =  React.useState({});
 
   function NotRegistered() {
@@ -27,6 +28,28 @@ function TabProposals({ voter, steps, activeStep }) {
     return <Typography>
       Bad workflow status, contract is currently {steps[activeStep]}
     </Typography>;
+  }
+
+  function VotesTalliedNotVoter() {
+    console.log("Votes Tallied not voter");
+    return (
+      <Card sx={{ minWidth: 275 }}>
+      <CardContent>
+        <Typography variant="h4" gutterBottom>
+          Winning proposal
+        </Typography>
+        <Typography variant="h5" component="div">
+          ID: {winningProposalId}
+        </Typography>
+        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+        N/A votes
+        </Typography>
+        <Typography variant="h3">
+        You can't see details, you are not a voter!
+        </Typography>
+      </CardContent>
+    </Card>
+    )
   }
 
   function VotesTallied() {
@@ -96,7 +119,11 @@ function TabProposals({ voter, steps, activeStep }) {
           return <ListProposals />
         }
       case activeStep === steps.indexOf("Votes tallied"):
-        return <VotesTallied />;
+        if (!voter.isRegistered) {
+          return <VotesTalliedNotVoter />
+        } else {
+          return <VotesTallied />
+        }
       default:
         return <BadWorkFlow />;
     }
@@ -107,9 +134,13 @@ function TabProposals({ voter, steps, activeStep }) {
       console.log("get winner");
       let winningProposalID = await contract.methods.winningProposalID().call({ from: currentAccount });
       console.log("Winner is: "+ winningProposalID);
-      let winningProposal = await getProposal(winningProposalID);
-      setWinningProposal(winningProposal);
-      console.log("Winner is: "+ winningProposal);
+      setWinningProposalId(winningProposalID);
+      console.log(voter);
+      if (voter.isRegistered) {
+        let winningProposal = await getProposal(winningProposalID);
+        setWinningProposal(winningProposal);
+        console.log("Winner is: "+ winningProposal);
+      }
     }
 
     const getProposal = async (proposalId) => {
@@ -144,7 +175,7 @@ function TabProposals({ voter, steps, activeStep }) {
     if (contract && voter.isRegistered && activeStep < steps.indexOf("Votes tallied")) { 
       getOldEvents(); 
     }
-  }, [voter]) // empty array means nothing to watch, so run once and no more
+  }, [voter, activeStep, contract, currentAccount, steps]) // empty array means nothing to watch, so run once and no more
 
 /*   React.useEffect(() => {
     console.log("updated voter");

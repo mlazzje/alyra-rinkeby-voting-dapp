@@ -18,42 +18,44 @@ function TopBar() {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const addNotif = () => {
-    console.log("Set notif from "+notification);
-    console.log("From "+notifCount);
+  const addNotif = React.useCallback(() => {
+    console.log("From notif " + notifCount);
     setNotifications(++notifCount);
-  }
+  },[notifCount]);
 
-  const subscribeEvent = () => {
-    contract.events.ProposalRegistered(() => {
-    }).on("connected", function (subscriptionId) {
-      console.log('SubID: ', subscriptionId);
-    })
-      .on('data', function (event) {
-        console.log('Event: ' + event);
-        console.log('Proposal ID: ' + event.returnValues.proposalId);
-        // addProposalId(event.returnValues.proposalId);
-        addNotif();
-        enqueueSnackbar('New proposal added, ID: ' + event.returnValues.proposalId
-          , { variant: 'info'});
+  const subscribeEvent = React.useCallback(() => {
+    if (contract) {
+      contract.events.ProposalRegistered(() => {
+      }).on("connected", function (subscriptionId) {
+        console.log('SubID: ', subscriptionId);
       })
-      .on('changed', function (event) {
-        //Do something when it is removed from the database.
-      })
-      .on('error', function (error, receipt) {
-        console.log('Error:', error, receipt);
-      });
-  }
+        .on('data', function (event) {
+          console.log('Event: ' + event);
+          console.log('Proposal ID: ' + event.returnValues.proposalId);
+          // addProposalId(event.returnValues.proposalId);
+          addNotif();
+          enqueueSnackbar('New proposal added, ID: ' + event.returnValues.proposalId
+            , { variant: 'info' });
+        })
+        .on('changed', function (event) {
+          //Do something when it is removed from the database.
+        })
+        .on('error', function (error, receipt) {
+          console.log('Error:', error, receipt);
+        });
+    }
+  }, [contract, enqueueSnackbar, addNotif]);
 
   /* const addProposalId = (proposalId) => {
     setProposalsId(current => [...current, proposalId]);
   } */
 
   React.useEffect(() => {
+    console.log("Top bar");
     if (contract) {
       subscribeEvent();
     };
-  }, [contract]) // empty array means nothing to watch, so run once and no more
+  }, [contract, subscribeEvent]) // empty array means nothing to watch, so run once and no more
 
   return (
     <Box sx={{ flexGrow: 1 }}>
