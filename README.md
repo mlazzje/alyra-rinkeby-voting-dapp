@@ -58,7 +58,7 @@ From there, follow the instructions on the hosted React app.
 
 ### Smart contract
 
-The smart contract has been deployed on Goerli at this addres
+The smart contract has been deployed on Goerli at this address
 ```
 0xcfc626A6f14Ac6bd486ee90A8Ae299d59b78c6A6
 ```
