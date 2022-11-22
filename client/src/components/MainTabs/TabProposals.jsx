@@ -132,19 +132,19 @@ function TabProposals({ voter, steps, activeStep }) {
   React.useEffect(() => {
     const getWinner = async () => {
       console.log("get winner");
-      let winningProposalID = await contract.methods.winningProposalID().call({ from: currentAccount });
+      const winningProposalID = await contract.methods.winningProposalID().call({ from: currentAccount });
       console.log("Winner is: "+ winningProposalID);
       setWinningProposalId(winningProposalID);
       console.log(voter);
       if (voter.isRegistered) {
-        let winningProposal = await getProposal(winningProposalID);
+        const winningProposal = await getProposal(winningProposalID);
         setWinningProposal(winningProposal);
         console.log("Winner is: "+ winningProposal);
       }
     }
 
     const getProposal = async (proposalId) => {
-      let proposal = await contract.methods.getOneProposal(proposalId).call({ from: currentAccount });
+      const proposal = await contract.methods.getOneProposal(proposalId).call({ from: currentAccount });
       return {
         id: proposalId,
         description: proposal.description,
@@ -160,7 +160,8 @@ function TabProposals({ voter, steps, activeStep }) {
       });
       // NOT USED YET
       let proposalsId = oldEvents.map((e) => e.returnValues.proposalId);
-      setProposals(await Promise.all(proposalsId.map(async (p) => await getProposal(p))));
+      let _proposals = await Promise.all(proposalsId.map(async (p) => await getProposal(p)))
+      setProposals(_proposals);
     }
 
     console.log("proposals useEffect updated");

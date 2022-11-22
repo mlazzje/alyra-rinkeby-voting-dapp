@@ -14,17 +14,19 @@ function TopBar() {
 
   const { state: { contract } } = useEth();
   const [notification, setNotifications] = React.useState(0);
-  let notifCount = 0 // Lack of react knowledge
+  const [subscribed, setSubscribed] = React.useState(false);
+  let notifCount = 0; // Lack of react knowledge
 
   const { enqueueSnackbar } = useSnackbar();
 
   const addNotif = React.useCallback(() => {
     console.log("From notif " + notifCount);
+    // let _notification = notification + 1;
     setNotifications(++notifCount);
-  },[notifCount]);
+  }, [notifCount]);
 
   const subscribeEvent = React.useCallback(() => {
-    if (contract) {
+    if (contract && !subscribed) {
       contract.events.ProposalRegistered(() => {
       }).on("connected", function (subscriptionId) {
         console.log('SubID: ', subscriptionId);
@@ -43,8 +45,9 @@ function TopBar() {
         .on('error', function (error, receipt) {
           console.log('Error:', error, receipt);
         });
+      setSubscribed(true);
     }
-  }, [contract, enqueueSnackbar, addNotif]);
+  }, [contract, enqueueSnackbar, addNotif, subscribed]);
 
   /* const addProposalId = (proposalId) => {
     setProposalsId(current => [...current, proposalId]);
@@ -73,7 +76,7 @@ function TopBar() {
           <Box sx={{ display: { xs: 'flex', md: 'flex' } }}>
             <IconButton
               size="large"
-              aria-label="show 17 new notifications"
+              aria-label="new notifications"
               color="inherit"
             >
               <Badge badgeContent={notification} color="error">

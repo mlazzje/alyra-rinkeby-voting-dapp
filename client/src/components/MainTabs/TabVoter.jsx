@@ -59,8 +59,11 @@ function TabVoter({ steps, activeStep, voter, setVoter, defaultVoter }) {
     const addVote = async () => {
       const input = inputVote.current.value || "";
       console.log("Vote: " + input);
-      if (input.length === 0 && input === 0) {
+      if (input.length === 0) {
         setErrorMessage("You can't vote nothing");
+        inputVote.current.value = "";
+      } else if (parseInt(input) === 0) {
+        setErrorMessage("Can't be proposal ID [0]");
         inputVote.current.value = "";
       } else if (!/^\d+$/.test(input)) {
         setErrorMessage("Should be a proposal ID (number)");
@@ -69,7 +72,7 @@ function TabVoter({ steps, activeStep, voter, setVoter, defaultVoter }) {
       else {
         setErrorMessage("");
         try {
-          await contract.methods.setVote(input).send({ from: currentAccount });
+          await contract.methods.setVote(parseInt(input)).send({ from: currentAccount });
         } catch (e) {
           console.error(e);
           setErrorMessage("ProposalID ["+input+"] doesn't exist");
@@ -144,7 +147,8 @@ function TabVoter({ steps, activeStep, voter, setVoter, defaultVoter }) {
     async function initVoter() {
       console.log("Init voter");
       setVoter(defaultVoter);
-      setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
+      const _voter = await contract.methods.getVoter(currentAccount).call({ from: currentAccount });
+      setVoter(_voter);
     }
     initVoter().catch(console.log);
   }, [contract, activeStep, currentAccount, defaultVoter, setVoter]) // empty array means nothing to watch, so run once and no more

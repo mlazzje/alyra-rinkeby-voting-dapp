@@ -67,8 +67,9 @@ function BasicTabs() {
   React.useEffect(() => {
     const initVoter = async () => {
       console.log("Init voter");
-      setVoter(defaultVoter);
-      setVoter(await contract.methods.getVoter(currentAccount).call({ from: currentAccount }));
+      // setVoter(defaultVoter);
+      const _voter = await contract.methods.getVoter(currentAccount).call({ from: currentAccount });
+      setVoter(_voter);
     }
 
     const initStep = async () => {

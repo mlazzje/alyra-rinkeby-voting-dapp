@@ -47,12 +47,12 @@ contract Voting is Ownable {
     /// @dev All events available
 
     /**
-     * @dev Emits event when a new voter registered
+     * @notice Emits event when a new voter registered
      * @return voterAddress The new voter address
      */
     event VoterRegistered(address voterAddress);
     /**
-     * @dev Emits event when workflow status changes
+     * @notice Emits event when workflow status changes
      * @return previousStatus The previous workflow status
      * @return newStatus The new workflow status
      */
@@ -61,12 +61,12 @@ contract Voting is Ownable {
         WorkflowStatus newStatus
     );
     /**
-     * @dev Emits event when a new proposal is registered
+     * @notice Emits event when a new proposal is registered
      * @return proposalId The proposal ID
      */
     event ProposalRegistered(uint256 proposalId);
     /**
-     * @dev Emits event when a voter voted
+     * @notice Emits event when a voter voted
      * @return voter The voter address
      * @return proposalId The voted proposal ID
      */
@@ -86,7 +86,8 @@ contract Voting is Ownable {
     /// @dev all getters available externally, only for voters
 
     /**
-     * @dev Returns the voter with address, only for voters
+     * @notice Returns the voter with address
+     * @dev Only for voters
      * @param _addr The address of voter to retrieve
      * @return voter The voter
      */
@@ -100,7 +101,8 @@ contract Voting is Ownable {
     }
 
     /**
-     * @dev Returns a proposal with ID, only for voters
+     * @notice Returns a proposal with ID
+     * @dev Only for voters
      * @param _id The ID of the proposal
      * @return proposal The proposal
      */
@@ -113,10 +115,11 @@ contract Voting is Ownable {
         return proposalsArray[_id];
     }
 
-    /// @dev for RegisteringVoters step, only for the owner
+    /// @dev For RegisteringVoters step, only for the owner
 
     /**
-     * @dev Add a voter with his/her address only for the owner
+     * @notice Add a voter with his/her address
+     * @dev Only for the owner and emits VoterRegistered event
      * @param _addr Address of the voter
      */
     function addVoter(address _addr) external onlyOwner {
@@ -130,10 +133,11 @@ contract Voting is Ownable {
         emit VoterRegistered(_addr);
     }
 
-    /// @dev for ProposalsRegistrationStarted step, only for voters added by owner during 1st step
+    /// @dev For ProposalsRegistrationStarted step, only for voters added by owner during 1st step
 
     /**
-     * @dev Add a proposal with its description, only for voters
+     * @notice Add a proposal with its description
+     * @dev Only for voters and emits ProposalRegistered event
      * @param _desc Description of the proposal
      */
     function addProposal(string calldata _desc) external onlyVoters {
@@ -157,10 +161,11 @@ contract Voting is Ownable {
         emit ProposalRegistered(proposalsArray.length - 1);
     }
 
-    /// @dev for VotingSessionStarted step, only for voters added by owner during 1st step
+    /// @dev For VotingSessionStarted step, only for voters added by owner during 1st step
     
     /**
-     * @dev Set a vote, only for voters
+     * @notice Set a vote
+     * @dev Only for voters and emits Voted event
      * @param _id Proposal ID voted
      */
     function setVote(uint256 _id) external onlyVoters {
@@ -178,10 +183,11 @@ contract Voting is Ownable {
         emit Voted(msg.sender, _id);
     }
 
-    /// @dev all Owner functions to go to the next step by following WorkflowStatus enum
+    /// @dev All Owner functions to go to the next step by following WorkflowStatus enum
     
     /**
-     * @dev Start the 2nd step ProposalsRegistrationStarted, only for owner
+     * @notice Start the 2nd step ProposalsRegistrationStarted
+     * @dev Only for owner and emits WorkflowStatusChange event
      */
     function startProposalsRegistering() external onlyOwner {
         require(
@@ -201,7 +207,8 @@ contract Voting is Ownable {
     }
 
     /**
-     * @dev Start the 3rd step ProposalsRegistrationEnded, only for owner
+     * @notice Start the 3rd step ProposalsRegistrationEnded
+     * @dev Only for owner and emits WorkflowStatusChange event
      */
     function endProposalsRegistering() external onlyOwner {
         require(
@@ -216,7 +223,8 @@ contract Voting is Ownable {
     }
 
     /**
-     * @dev Start the 4th step VotingSessionStarted, only for owner
+     * @notice Start the 4th step VotingSessionStarted
+     * @dev Only for owner and emits WorkflowStatusChange event
      */
     function startVotingSession() external onlyOwner {
         require(
@@ -231,7 +239,8 @@ contract Voting is Ownable {
     }
 
     /**
-     * @dev Start the 5th step VotingSessionEnded, only for owner
+     * @notice Start the 5th step VotingSessionEnded
+     * @dev Only for owner and emits WorkflowStatusChange event
      */
     function endVotingSession() external onlyOwner {
         require(
@@ -246,7 +255,8 @@ contract Voting is Ownable {
     }
 
     /**
-     * @dev End the voting session and nominate the winning proposal, only for owner
+     * @notice End the voting session and nominate the winning proposal
+     * @dev Only for owner and emits WorkflowStatusChange event
      */
     function tallyVotes() external onlyOwner {
         require(
