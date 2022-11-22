@@ -68,3 +68,15 @@ The smart contract has been deployed on Goerli at this address
 ### DApp
 
 DApp is hosted on Vercel here: [https://alyra-rinkeby-voting-dapp-by-mlazzje.vercel.app/](https://alyra-rinkeby-voting-dapp-by-mlazzje.vercel.app/)
+
+## Grading tasks
+
+- [x] Review smart contract -> Limit number of proposals to 100 with a require when adding proposal, in order to avoid DoS Gas limit during tally votes
+- [x] Commented smart contract -> truffle/contracts/Voting.sol
+- [x] Have a decentralized application that allows to call all the functions
+- [x] Video of the workflow -> Submitted on Alyra website
+- [x] Use of one event -> Subscription to the event ProposalRegistered
+- [x] Display the account used and the proposals
+- [x] Deploy the DApp on public server -> [Vercel deployment](https://alyra-rinkeby-voting-dapp-by-mlazzje.vercel.app/)
+- [x] Displayed elements of the DApp adapted to the account used
+- [x] Use at least one React component
