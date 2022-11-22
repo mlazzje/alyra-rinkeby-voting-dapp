@@ -67,4 +67,4 @@ The smart contract has been deployed on Goerli at this addres
 
 ### DApp
 
-DApp is hosted on Vercel here: [See on Etherscan Goerli](https://goerli.etherscan.io/tx/0x27185954f9fa7fcd16c4efe2e2806465b6881bfc2304bb7fbc8baeb71e17c7f6)
+DApp is hosted on Vercel here: [https://alyra-rinkeby-voting-dapp-by-mlazzje.vercel.app/](https://alyra-rinkeby-voting-dapp-by-mlazzje.vercel.app/)
