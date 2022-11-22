@@ -13,7 +13,7 @@ Web3.js v1.7.4
 
 ## Init
 
-Install node modules required by backend and frontend
+After cloning the project, install node modules required by truffle and website
 ```sh
 npm --prefix client install client
 npm --prefix truffle install truffle
@@ -22,20 +22,25 @@ npm --prefix truffle install truffle
 ### Truffle
 Create .env file based on truffle/.env.example file
 ```sh
-touch truffle/.env
+cd truffle
+cp .env.example .env
+nano .env
 ```
 
 To run tests, run ganache and run this command
 ```sh
+cd truffle
 truffle test test/voting.test.js --network development
 ```
 
 To deploy Voting contract locally
 ```sh
+cd truffle
 truffle deploy Voting.sol --network development
 ```
 To deploy Voting contract on Goerli
 ```sh
+cd truffle
 truffle deploy Voting.sol --network goerli
 ```
 
@@ -47,4 +52,19 @@ cd client
 npm run start
 ```
 
-From there, follow the instructions on the hosted React app. It will walk you through using Truffle and Ganache to deploy the `SimpleStorage` contract, making calls to it, and sending transactions to change the contract's state.
+From there, follow the instructions on the hosted React app.
+
+## Hosted DApp
+
+### Smart contract
+
+The smart contract has been deployed on Goerli at this addres
+```
+0xcfc626A6f14Ac6bd486ee90A8Ae299d59b78c6A6
+```
+
+[See on Etherscan Goerli](https://goerli.etherscan.io/tx/0x27185954f9fa7fcd16c4efe2e2806465b6881bfc2304bb7fbc8baeb71e17c7f6)
+
+### DApp
+
+DApp is hosted on Vercel here: [See on Etherscan Goerli](https://goerli.etherscan.io/tx/0x27185954f9fa7fcd16c4efe2e2806465b6881bfc2304bb7fbc8baeb71e17c7f6)
